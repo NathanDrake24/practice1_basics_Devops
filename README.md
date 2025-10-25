@@ -53,7 +53,7 @@
 # 2 Ход работы 
 ---
 ## 2.1 Пример блока кода для конфигурационного файла
-
+```
 # Название workflow
 name: CI-CD Pipeline
 
@@ -97,7 +97,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}  # Пользователь сервера
           key: ${{ secrets.SERVER_SSH_KEY }}  # SSH-ключ
           script: |  # Скрипт для деплоя
-            rsync -avz --delete ./build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/html
+            rsync -avz --delete ./build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/html```
 
 ## 2.3 Инструкции по настройке
 #### - Добавление секретов
