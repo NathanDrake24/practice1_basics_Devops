@@ -53,8 +53,52 @@
 # 2 Ход работы 
 ---
 ## 2.1 Пример блока кода для конфигурационного файла
-```name: CI-CD Pipeline on: push: branches: - main jobs: build-test: runs-on: ubuntu-latest steps: - name: Checkout code uses: actions/checkout@v3 - name: Install dependencies run: npm install - name: Run tests run: npm test - name: Build project run: npm run build deploy: needs: build-test runs-on: ubuntu-latest if: ${{ success() }} steps: - name: Checkout code uses: actions/checkout@v3 - name: Deploy via SSH uses: appleboy/ssh-action@master with: host: ${{ secrets.SERVER_HOST }} username: ${{ secrets.SERVER_USER }} key: ${{ secrets.SERVER_SSH_KEY }} script: | rsync -avz --delete ./build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/html
-```
+
+# Название workflow
+name: CI-CD Pipeline
+
+# Триггеры workflow
+on:
+  push:
+    branches:
+      - main  # Запуск при пуше в ветку main
+
+# Определение заданий
+jobs:
+  # Задание для сборки и тестирования
+  build-test:
+    runs-on: ubuntu-latest  # Выполнение на Ubuntu
+    steps:
+      - name: Checkout code  # Клонирование репозитория
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies  # Установка зависимостей
+        run: npm install
+      
+      - name: Run tests  # Запуск тестов
+        run: npm test
+      
+      - name: Build project  # Сборка проекта
+        run: npm run build
+
+  # Задание для деплоя
+  deploy:
+    needs: build-test  # Зависит от успешного завершения build-test
+    runs-on: ubuntu-latest
+    if: ${{ success() }}  # Запуск только при успешном выполнении предыдущих шагов
+    steps:
+      - name: Checkout code  # Повторное клонирование кода
+        uses: actions/checkout@v3
+      
+      - name: Deploy via SSH  # Деплой через SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}  # Хост сервера из секретов
+          username: ${{ secrets.SERVER_USER }}  # Пользователь сервера
+          key: ${{ secrets.SERVER_SSH_KEY }}  # SSH-ключ
+          script: |  # Скрипт для деплоя
+            rsync -avz --delete ./build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/html
+
 ## 2.3 Инструкции по настройке
 #### - Добавление секретов
 #### - Перейдите в настройки репозитория: Settings → Secrets and variables → Actions
